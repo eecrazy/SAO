@@ -1,0 +1,115 @@
+diff --git a/slime/backends/megatron_utils/actor.py b/slime/backends/megatron_utils/actor.py
+index adbfef35..e587e41c 100644
+--- a/slime/backends/megatron_utils/actor.py
++++ b/slime/backends/megatron_utils/actor.py
+@@ -383,15 +383,26 @@ class MegatronTrainRayActor(TrainRayActor):
+         compute_advantages_and_returns(self.args, rollout_data)
+ 
+         self.args.loss_type = "value_loss"
+-        train(
+-            rollout_id,
+-            self.model,
+-            self.optimizer,
+-            self.opt_param_scheduler,
+-            data_iterator,
+-            num_microbatches,
+-            global_batch_sizes,
+-        )
++        # paper_006 SAO TTUR (method_spec B.3 "faster value update", K=2): run K
++        # critic gradient updates per rollout batch on FIXED targets — values and
++        # returns were computed once above, so both passes regress to the same
++        # targets. K comes from env SAO_CRITIC_UPDATES_PER_STEP (default 1 =
++        # stock slime). Side effect: the critic LR scheduler advances K× per
++        # rollout (its warmup completes proportionally sooner) — accepted, see
++        # scratch_impl/implementation_plan.md C5.
++        for _sao_ttur_i in range(int(os.environ.get("SAO_CRITIC_UPDATES_PER_STEP", "1"))):
++            if _sao_ttur_i > 0:
++                for _it in data_iterator:
++                    _it.reset()
++            train(
++                rollout_id,
++                self.model,
++                self.optimizer,
++                self.opt_param_scheduler,
++                data_iterator,
++                num_microbatches,
++                global_batch_sizes,
++            )
+ 
+         if mpu.is_pipeline_last_stage() and "values" in rollout_data:
+             from slime.backends.megatron_utils.data import tensors_to_cpu
+diff --git a/slime/backends/megatron_utils/model_provider.py b/slime/backends/megatron_utils/model_provider.py
+index 090b692f..35318fff 100644
+--- a/slime/backends/megatron_utils/model_provider.py
++++ b/slime/backends/megatron_utils/model_provider.py
+@@ -1,6 +1,7 @@
+ # Adapt from https://github.com/NVIDIA/Megatron-LM/blob/b1efb3c7126ef7615e8c333432d76e08038e17ff/pretrain_gpt.py
+ import argparse
+ import inspect
++import logging
+ import re
+ from contextlib import nullcontext
+ from typing import Literal
+@@ -284,3 +285,18 @@ def freeze_model_params(model: GPTModel, args: argparse.Namespace):
+                 if re.search(pattern, name):
+                     param.requires_grad = False
+                     break
++        # paper_006_sao: verify the frozen-attention critic freeze actually took.
++        # Qwen3.5 is hybrid (24 linear-attn + 8 full-attn of 32 layers); slime
++        # nests BOTH mixer types under the `self_attention` submodule, so the
++        # "self_attention" pattern must freeze all token-mixers (both types) while
++        # leaving MLP/embeddings/value-head trainable. A frozen fraction near 0%
++        # or 100% signals a naming mismatch (method fidelity bug). Logs a few
++        # example frozen names for an eyeball check.
++        frozen = sum(p.numel() for p in model.parameters() if not p.requires_grad)
++        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
++        examples = [n for n, p in model.named_parameters() if not p.requires_grad][:4]
++        logging.getLogger(__name__).info(
++            "SAO_FREEZE patterns=%s frozen=%d trainable=%d (%.1f%% frozen); e.g. %s",
++            args.freeze_params_name_list, frozen, trainable,
++            100 * frozen / max(frozen + trainable, 1), examples,
++        )
+diff --git a/slime/rollout/sglang_rollout.py b/slime/rollout/sglang_rollout.py
+index 9dcf5fce..47081989 100644
+--- a/slime/rollout/sglang_rollout.py
++++ b/slime/rollout/sglang_rollout.py
+@@ -164,6 +164,19 @@ async def generate(args: Namespace, sample: Sample, sampling_params: dict[str, A
+ 
+     prompt_ids = _prepare_prompt_ids(sample, state.tokenizer, state.processor)
+ 
++    # paper_006 (D-len): enforce a HARD *total* response-length cap. Fully-async
++    # aborts in-flight generations on weight updates and requeues them; the
++    # continuation re-dispatches with the GLOBAL sampling_params (full
++    # max_new_tokens), so a trajectory spanning K weight-versions accumulates up to
++    # K× rollout_max_response_len (observed 24k→36k and climbing → actor OOM on the
++    # 36k microbatch). Cap the continuation budget by tokens already generated so
++    # the total never exceeds the configured cap; when exhausted → TRUNCATED below.
++    sampling_params = dict(sampling_params)
++    sampling_params["max_new_tokens"] = min(
++        sampling_params["max_new_tokens"],
++        max(0, args.rollout_max_response_len - sample.response_length),
++    )
++
+     assert (
+         sampling_params["max_new_tokens"] >= 0
+     ), f"max_new_tokens: {sampling_params['max_new_tokens']} should not be less than 0"
+diff --git a/train_async.py b/train_async.py
+index 9141b612..13a35727 100644
+--- a/train_async.py
++++ b/train_async.py
+@@ -56,8 +56,13 @@ def train(args):
+             rollout_id, args.save_interval, num_rollout_per_epoch, args.num_rollout
+         ):
+             force_sync = release_train or rollout_id == args.num_rollout - 1
+-            if actor_trains:
+-                actor_model.save_model(rollout_id, force_sync=force_sync)
++            # paper_006 SAO fix (verification finding D5): save the actor during
++            # critic-only warmup steps too. Otherwise a walltime kill inside the
++            # warmup leaves an empty actor --load dir, the missing-ckpt fallback
++            # resets start_rollout_id to 0, and the run restarts from scratch
++            # against an already-warmed critic. Saving the (untrained) actor is
++            # cheap and makes the warmup segment-resumable.
++            actor_model.save_model(rollout_id, force_sync=force_sync)
+             if args.use_critic:
+                 critic_model.save_model(rollout_id, force_sync=force_sync)
+             if args.rollout_global_dataset:

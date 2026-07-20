@@ -1,0 +1,22 @@
+# secrets — never commit
+.env
+*.key
+*token*
+*secret*
+
+# heavy artifacts / run outputs (recreate per README)
+data/
+runs/
+logs/
+eval/*.jsonl
+*.jsonl
+*.sqsh
+*.safetensors
+checkpoints/
+*.ckpt
+wandb/
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
