@@ -13,7 +13,7 @@ HF_MODEL=${HF_MODEL:-$HF_HOME/hub/models--Qwen--Qwen3.5-4B/snapshots/851bf6e806e
 TORCH_DIST=${TORCH_DIST:-$RUNS/qwen3.5-4B_torch_dist}
 DATA=${DATA:-$RUNS/data/pool.jsonl}
 
-RUN_DIR=$RUNS/runs/$ARM
+RUN_DIR=${SAO_RUN_DIR_ROOT:-$RUNS/runs}/$ARM
 mkdir -p "$RUN_DIR"
 
 # MODEL_ARGS from the pinned slime clone (dense gated-attention Qwen3.5-4B spec).
