@@ -76,6 +76,31 @@ docs/                   method_spec, experiment_spec, and the reproduction analy
 
 ## Setup
 
+### Local 8×H20 setup with uv
+
+For the current host, use the checked-in host-native workflow instead of the
+cluster-specific SLURM/Enroot launchers:
+
+```bash
+./scripts/pipeline.sh setup
+./scripts/pipeline.sh preflight
+./scripts/pipeline.sh download
+./scripts/pipeline.sh data
+./scripts/pipeline.sh filter
+./scripts/pipeline.sh convert
+./scripts/pipeline.sh train sao smoke
+./scripts/pipeline.sh train grpo_dis smoke
+./scripts/pipeline.sh ready
+```
+
+It creates `.venv` with uv, pins the CUDA/RL stack used by the reference image,
+applies the slime/SAO/Megatron/SGLang patches, and configures 4 H20s for the
+actor+critic plus 4 for rollouts. Full training, export, evaluation, resume
+semantics, and hardware rationale are documented in
+[`docs/LOCAL_UV.md`](docs/LOCAL_UV.md).
+
+### Original container/cluster setup
+
 1. **slime** — clone and pin, then apply the patch:
    ```bash
    git clone https://github.com/THUDM/slime && cd slime
