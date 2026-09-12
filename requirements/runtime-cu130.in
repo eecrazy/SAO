@@ -1,0 +1,59 @@
+# Registry dependencies for the validated Python 3.12 / torch 2.11 / cu130
+# runtime.  Compile with scripts/lock_environment.sh.  Native projects patched
+# and built from pinned commits remain in scripts/setup_uv.sh and are recorded
+# in reproducibility/environment.md.
+
+aiohttp>=3.10
+cmake>=3.30
+datasets>=4.0
+huggingface-hub[cli]>=0.34
+ninja>=1.11
+numpy<2
+packaging>=24.2
+psutil>=6
+pybind11>=2.13
+pytest>=8
+pyyaml>=6
+requests>=2.32
+setuptools>=77,<80
+setuptools-rust>=1.11
+wheel>=0.45
+
+sglang[all]==0.5.13
+nvidia-cuda-nvcc==13.0.88
+nvidia-cuda-cccl==13.0.85
+nvidia-cuda-crt==13.0.88
+nvidia-nvvm==13.0.88
+flash-linear-attention==0.4.2
+nvidia-mathdx==25.6.0
+onnx
+onnxscript
+tilelang==0.1.9
+nvidia-modelopt[torch]>=0.37.0
+kernels<0.15.0
+
+# slime@680824d requirements (copied here so the lock is self-contained).
+accelerate
+anthropic
+blake3
+blobfile
+e2b
+httpx[http2]
+mcp[cli]
+memray
+numba
+omegaconf
+openai
+openai-agents
+pillow
+pylatexenc
+qwen_vl_utils
+ray[default]
+ring_flash_attn
+safetensors
+sglang-router>=0.2.3
+tensorboard
+transformers
+wandb
+xxhash
+zstandard

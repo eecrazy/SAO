@@ -25,6 +25,12 @@ from sao_plugin.prompt import with_instruction  # noqa: E402
 
 QUESTION_KEYS = ["question", "problem", "prompt", "Question", "Problem"]
 ANSWER_KEYS = ["answer", "label", "final_answer", "Answer", "expected_answer"]
+DATASET_REVISIONS = {
+    "opencompass/AIME2025": "a6ad95f611d72cf628a80b58bd0432ef6638f958",
+    "ByteDance-Seed/BeyondAIME": "c705198ae1043810b1e1693bd879250b51a7a523",
+    "CMU-AIRe/hmmt-aime-2025": "7bdf466a5cecd539966303cfefe01380a296819b",
+    "HuggingFaceH4/MATH-500": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+}
 
 
 def pick(row, keys):
@@ -68,7 +74,7 @@ def main():
     from datasets import load_dataset
 
     def all_rows(path, *cfg):
-        ds = load_dataset(path, *cfg)
+        ds = load_dataset(path, *cfg, revision=DATASET_REVISIONS[path])
         for split in ds:
             yield from ds[split]
 

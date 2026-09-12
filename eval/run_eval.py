@@ -20,7 +20,6 @@ import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sao_plugin.reward_math import grade_response  # noqa: E402
 
 
 async def sample_once(session, args, prompt):
@@ -43,6 +42,7 @@ async def sample_once(session, args, prompt):
 
 async def run_sampling(args):
     import aiohttp
+    from sao_plugin.reward_math import grade_response
 
     rows = [json.loads(line) for line in open(args.bench)]
     done = defaultdict(set)

@@ -35,6 +35,9 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sao_plugin.prompt import with_instruction  # noqa: E402
 
+SKYWORK_DATASET = "Skywork/Skywork-OR1-RL-Data"
+SKYWORK_REVISION = "1cdedc52e0e2db85fdf252f9be682e63a5a38c33"
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -53,7 +56,7 @@ def main():
 
     from datasets import load_dataset
 
-    ds = load_dataset("Skywork/Skywork-OR1-RL-Data", split="math")
+    ds = load_dataset(SKYWORK_DATASET, revision=SKYWORK_REVISION, split="math")
     print(f"loaded math split: {ds.num_rows} rows")
 
     stats = Counter()
