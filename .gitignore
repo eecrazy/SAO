@@ -122,3 +122,29 @@ Thumbs.db
 *.bak
 tmp/
 temp/
+
+# Curated, immutable reproduction snapshots (all other generated data/runs
+# remain ignored by the broad rules above).
+!data/
+data/*
+!data/candidates.jsonl
+!data/filter_results.jsonl
+!data/pool.jsonl
+!data/pool.jsonl.stats.json
+!data/bench/
+data/bench/*
+!data/bench/aime25.jsonl
+!data/bench/beyondaime.jsonl
+!data/bench/hmmt25.jsonl
+!data/bench/math500.jsonl
+
+!runs/
+runs/*
+!runs/eval/
+runs/eval/*
+!runs/eval/base/
+!runs/eval/base/*.jsonl
+!runs/eval/final_sao/
+!runs/eval/final_sao/*.jsonl
+!runs/eval/final_grpo/
+!runs/eval/final_grpo/*.jsonl
