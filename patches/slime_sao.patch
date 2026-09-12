@@ -113,3 +113,18 @@ index 9141b612..13a35727 100644
              if args.use_critic:
                  critic_model.save_model(rollout_id, force_sync=force_sync)
              if args.rollout_global_dataset:
+diff --git a/slime/ray/actor_group.py b/slime/ray/actor_group.py
+--- a/slime/ray/actor_group.py
++++ b/slime/ray/actor_group.py
+@@ -72,4 +72,5 @@ class RayTrainGroup:
+             for path in [
++                "torch_memory_saver_hook_mode_preload_cu13.abi3.so",
+                 "torch_memory_saver_hook_mode_preload_cu12.abi3.so",
+                 "torch_memory_saver_hook_mode_preload.abi3.so",
+             ]:
+diff --git a/tools/convert_torch_dist_to_hf.py b/tools/convert_torch_dist_to_hf.py
+--- a/tools/convert_torch_dist_to_hf.py
++++ b/tools/convert_torch_dist_to_hf.py
+@@ -144 +144 @@ def save_tensors(args, model_name, state_dict, output_dir, chunk_size, vocab_siz
+-                    total_size += tensor_size
++                        total_size += tensor_size

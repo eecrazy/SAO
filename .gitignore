@@ -17,6 +17,18 @@ checkpoints/
 wandb/
 
 # python
+.venv/
+.uv-cache/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# pinned third-party sources are recreated by scripts/setup_uv.sh
+slime/
+Megatron-LM/
+sglang/
+third_party/
+
+# local Hugging Face and generated artifacts
+.cache/
+artifacts/
