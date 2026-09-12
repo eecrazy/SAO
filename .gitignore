@@ -1,34 +1,124 @@
-# secrets — never commit
+# Secrets and machine-local overrides
 .env
+.env.*
+!.env.example
 *.key
-*token*
+*.pem
+*.token
 *secret*
 
-# heavy artifacts / run outputs (recreate per README)
+# Generated datasets and evaluation results
 data/
-runs/
-logs/
+datasets/
+results/
+outputs/
 eval/*.jsonl
 *.jsonl
-*.sqsh
-*.safetensors
+*.jsonl.*
+*.csv
+*.tsv
+*.parquet
+*.arrow
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# Model weights, checkpoints, and training artifacts
+artifacts/
 checkpoints/
-*.ckpt
+runs/
 wandb/
+mlruns/
+ray_results/
+lightning_logs/
+*.safetensors
+*.ckpt
+*.distcp
+*.bin
+*.pt
+*.pth
+*.onnx
+*.engine
+*.plan
 
-# python
+# Logs, scheduler output, and profiling traces
+logs/
+*.log
+*.log.*
+*.out
+*.err
+nohup.out
+slurm-*.out
+ray_spilled_objects/
+.ray/
+profile*/
+events.out.tfevents.*
+*.nsys-rep
+*.qdrep
+*.sqlite
+core
+core.*
+
+# Downloaded images, packages, and archives
+*.sqsh
+*.sif
+*.img
+*.iso
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.whl
+
+# Python environments, caches, coverage, and build output
 .venv/
+venv/
 .uv-cache/
+.cache/
 __pycache__/
-*.pyc
-.ipynb_checkpoints/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+*.egg
 
-# pinned third-party sources are recreated by scripts/setup_uv.sh
+# Native build products
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+
+# Pinned third-party sources are recreated by scripts/setup_uv.sh
 slime/
 Megatron-LM/
 sglang/
 third_party/
 
-# local Hugging Face and generated artifacts
-.cache/
-artifacts/
+# Editor, OS, and temporary files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
