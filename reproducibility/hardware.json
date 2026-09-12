@@ -1,0 +1,50 @@
+{
+  "captured_at": "2026-09-12T23:19:00+08:00",
+  "os": "Ubuntu 22.04.4 LTS",
+  "kernel": "Linux 5.4.119-19-0009.56 x86_64",
+  "cpu": {
+    "model": "AMD EPYC 9K84 96-Core Processor",
+    "logical_cpus_visible": 128,
+    "sockets": 2,
+    "cores_per_socket_visible": 32,
+    "threads_per_core": 2,
+    "numa_nodes": 2
+  },
+  "memory": {
+    "total": "1.5 TiB",
+    "swap": "0 B"
+  },
+  "gpu": {
+    "count": 8,
+    "name": "NVIDIA H20",
+    "memory_per_gpu_mib": 97871,
+    "compute_capability": "9.0",
+    "driver_version": "580.159.03",
+    "vbios_version": "96.00.D0.00.06",
+    "peer_topology": "NV18 between every GPU pair",
+    "numa_affinity": {
+      "gpu_0_to_3": 0,
+      "gpu_4_to_7": 1
+    }
+  },
+  "cuda": {
+    "host_toolkit": "13.3",
+    "nvcc": "V13.3.33",
+    "runtime_used_by_pytorch": "cu130"
+  },
+  "build_host": {
+    "architecture": "x86_64",
+    "glibc": "2.35-0ubuntu3.8",
+    "gcc": "11.4.0-1ubuntu1~22.04",
+    "gxx": "11.4.0-1ubuntu1~22.04",
+    "binutils": "2.38",
+    "make": "4.3",
+    "ninja": "1.13.0.git.kitware.jobserver-pipe-1",
+    "uv": "0.9.4",
+    "git": "2.34.1",
+    "curl": "7.81.0",
+    "patch": "2.7.6",
+    "tar": "1.34"
+  },
+  "privacy": "Hostname, network addresses, user names, and credentials are intentionally omitted."
+}

@@ -9,6 +9,11 @@ It keeps the upstream experiment definition and pins the same source revisions:
 - SGLang: `0.5.13` plus all four slime SGLang patches
 - Python 3.12, PyTorch 2.11.0 + CUDA 13.0 ABI, Transformer Engine 2.16.1
 
+Registry dependencies are fixed in
+`requirements/runtime-cu130.lock.txt` with exact versions and distribution
+hashes. `setup_uv.sh` converges the environment to that lock after building the
+pinned native components. See `reproducibility/environment.md` for provenance.
+
 The reference container is cu129, but this host exposes driver 580 and SGLang
 0.5.13's published wheels target torch 2.11/cu130. The local profile therefore
 uses slime's supported CUDA-13 build path. Native extensions compile against the
@@ -101,6 +106,12 @@ Export and evaluate the final actor checkpoints:
 
 Evaluation is also resumable per `(problem UID, sample index)`. Results are under
 `runs/eval/<tag>/`; `eval/run_eval.py aggregate` prints the three-benchmark mean.
+
+The completed `h20_v1` checkpoints were actor/critic iteration 546 for SAO and
+iteration 499 for GRPO-w/DIS. The final three-benchmark means were 47.389 and
+47.934 respectively (SAO−GRPO = −0.545 pp); both were far above the 25.125 base
+anchor. The full result table and exact configuration are in `H20_RESULTS.md`.
+The per-sample files used for those aggregates are committed under `runs/eval/`.
 
 ## Useful overrides
 

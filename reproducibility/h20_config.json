@@ -1,0 +1,53 @@
+{
+  "run_tag": "h20_v1",
+  "base_model": "Qwen/Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "training_data": "data/pool.jsonl",
+  "training_prompts": 3993,
+  "hardware": {"nodes": 1, "gpus": 8, "gpu_model": "NVIDIA H20", "actor_gpus": 4, "rollout_gpus": 4},
+  "parallelism": {"tensor": 2, "data": 2, "pipeline": 1, "context": 1, "distributed_optimizer": false},
+  "rollout": {
+    "max_response_tokens": 24576,
+    "temperature": 1.0,
+    "top_p": 1.0,
+    "global_batch_size": 128,
+    "weight_update_interval": 1,
+    "max_weight_staleness": 4,
+    "engines": 4,
+    "tensor_parallel_per_engine": 1,
+    "concurrency_per_engine": 24,
+    "memory_fraction_static": 0.85
+  },
+  "shared_optimizer": {"name": "adam", "actor_lr": 0.000001, "beta1": 0.9, "beta2": 0.98, "weight_decay": 0.1},
+  "dis": {"lower": 0.3, "upper": 5.0, "kl_coefficient": 0.0, "entropy_coefficient": 0.0},
+  "sao": {
+    "total_rollout_iterations": 547,
+    "critic_only_iterations": 47,
+    "actor_updates": 500,
+    "rollout_batch_size": 128,
+    "samples_per_prompt": 1,
+    "max_tokens_per_gpu": 12288,
+    "critic_lr": 0.000005,
+    "critic_lr_warmup_iterations": 10,
+    "critic_updates_per_actor_step": 2,
+    "gae_lambda_alpha": 1.5,
+    "critic_frozen_module_pattern": "self_attention",
+    "final_checkpoint_iteration": 546
+  },
+  "grpo_dis": {
+    "total_rollout_iterations": 500,
+    "actor_updates": 500,
+    "rollout_batch_size": 16,
+    "samples_per_prompt": 8,
+    "disable_std_normalization": true,
+    "max_tokens_per_gpu": 32768,
+    "final_checkpoint_iteration": 499
+  },
+  "evaluation": {
+    "max_response_tokens": 32768,
+    "temperature": 1.0,
+    "top_p": 1.0,
+    "concurrency": 256,
+    "explicit_seed": null,
+    "samples_per_problem": {"aime25": 64, "beyondaime": 32, "hmmt25": 64, "math500": 8}
+  }
+}

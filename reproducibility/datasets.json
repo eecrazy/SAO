@@ -1,0 +1,35 @@
+{
+  "resolved_at": "2026-09-12",
+  "authority": "The committed JSONL snapshots and SHA256SUMS are the exact experiment inputs. Revisions record the upstream commits resolved when this manifest was created.",
+  "datasets": [
+    {
+      "id": "Skywork/Skywork-OR1-RL-Data",
+      "revision": "1cdedc52e0e2db85fdf252f9be682e63a5a38c33",
+      "usage": "math split; source for data/candidates.jsonl"
+    },
+    {
+      "id": "opencompass/AIME2025",
+      "revision": "a6ad95f611d72cf628a80b58bd0432ef6638f958",
+      "usage": "AIME2025-I and AIME2025-II"
+    },
+    {
+      "id": "ByteDance-Seed/BeyondAIME",
+      "revision": "c705198ae1043810b1e1693bd879250b51a7a523",
+      "usage": "BeyondAIME evaluation"
+    },
+    {
+      "id": "CMU-AIRe/hmmt-aime-2025",
+      "revision": "7bdf466a5cecd539966303cfefe01380a296819b",
+      "usage": "rows whose data_source/source contains hmmt"
+    },
+    {
+      "id": "HuggingFaceH4/MATH-500",
+      "revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+      "usage": "MATH-500 evaluation anchor"
+    }
+  ],
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  }
+}

@@ -47,6 +47,14 @@ Full analysis: [`docs/final_report.md`](docs/final_report.md), [`docs/result_tab
 [`docs/mismatch_analysis.md`](docs/mismatch_analysis.md). Frozen method spec (paper-only):
 [`docs/method_spec.md`](docs/method_spec.md).
 
+### Completed 8×H20 run
+
+The later single-node `h20_v1` run used the committed 3,993-prompt pool. Its
+three-benchmark mean was 25.125 base, 47.389 SAO, and 47.934 GRPO-w/DIS, so SAO
+trailed GRPO-w/DIS by 0.545 pp in this run. This is a separate experiment from
+the H100 table above. Full configuration, per-benchmark scores, and caveats are
+in [`docs/H20_RESULTS.md`](docs/H20_RESULTS.md).
+
 ## Repo layout
 
 ```
@@ -67,6 +75,8 @@ patches/
   slime_sao.patch       in-place slime edits: TTUR, frozen-attention log, warmup-save,
                         and the fully-async response-length hard-cap (see below)
 docs/                   method_spec, experiment_spec, and the reproduction analysis
+reproducibility/        dataset/source revisions, hardware, results, and SHA256 manifest
+requirements/           complete hash-locked Python 3.12/cu130 runtime resolution
 ```
 
 > Paths in `jobs/*.sbatch|sh` are **cluster-specific** (they hard-code a `/lustre/...` workspace and
@@ -98,6 +108,17 @@ applies the slime/SAO/Megatron/SGLang patches, and configures 4 H20s for the
 actor+critic plus 4 for rollouts. Full training, export, evaluation, resume
 semantics, and hardware rationale are documented in
 [`docs/LOCAL_UV.md`](docs/LOCAL_UV.md).
+
+The exact training/evaluation JSONL snapshots are committed; model exports and
+checkpoints are intentionally not. After cloning, verify all snapshot hashes,
+row coverage, and reported aggregates with:
+
+```bash
+python scripts/verify_reproducibility.py
+```
+
+See [`reproducibility/environment.md`](reproducibility/environment.md) for the
+dependency-lock provenance and the precise limits on bitwise reproducibility.
 
 ### Original container/cluster setup
 

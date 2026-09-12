@@ -1,0 +1,43 @@
+{
+  "experiment": "single-node 8x NVIDIA H20, h20_v1",
+  "metric": "problem-macro pass@1 percentage",
+  "avg_pass1_3bench": "unweighted mean of AIME25, BeyondAIME, and HMMT25",
+  "arms": {
+    "base": {
+      "aime25": 37.083333333333336,
+      "beyondaime": 14.59375,
+      "hmmt25": 23.697916666666668,
+      "math500": 88.025,
+      "avg_pass1_3bench": 25.125
+    },
+    "sao": {
+      "checkpoint_iteration": 546,
+      "aime25": 58.125,
+      "beyondaime": 41.125,
+      "hmmt25": 42.916666666666664,
+      "math500": 95.425,
+      "avg_pass1_3bench": 47.389
+    },
+    "grpo_dis": {
+      "checkpoint_iteration": 499,
+      "aime25": 59.322916666666664,
+      "beyondaime": 39.84375,
+      "hmmt25": 44.635416666666664,
+      "math500": 96.175,
+      "avg_pass1_3bench": 47.934
+    }
+  },
+  "sao_minus_grpo_dis_pp": {
+    "aime25": -1.1979166666666643,
+    "beyondaime": 1.28125,
+    "hmmt25": -1.71875,
+    "math500": -0.75,
+    "avg_pass1_3bench": -0.545
+  },
+  "sampling": {
+    "aime25": {"problems": 30, "samples_per_problem": 64},
+    "beyondaime": {"problems": 100, "samples_per_problem": 32},
+    "hmmt25": {"problems": 30, "samples_per_problem": 64},
+    "math500": {"problems": 500, "samples_per_problem": 8}
+  }
+}
