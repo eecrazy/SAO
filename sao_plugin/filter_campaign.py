@@ -127,11 +127,20 @@ async def run_campaign(args, rows, done):
     with open(args.results, "a") as results_f:
         async with aiohttp.ClientSession(connector=connector) as session:
             tasks = [asyncio.create_task(process_problem(sem, session, args, row, results_f, lock)) for row in todo]
-            for fut in asyncio.as_completed(tasks):
-                await fut
-                finished += 1
-                if finished % 100 == 0:
-                    print(f"finished {finished}/{len(todo)}", flush=True)
+            try:
+                for fut in asyncio.as_completed(tasks):
+                    await fut
+                    finished += 1
+                    if finished % 100 == 0:
+                        print(f"finished {finished}/{len(todo)}", flush=True)
+            finally:
+                # Keep the append file open until in-flight requests have been
+                # cancelled and reaped. Otherwise Ctrl-C can let a task finish
+                # after the context manager closes results_f.
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
 
 
 def main():
@@ -176,7 +185,10 @@ def main():
     if args.emit:
         hist = Counter(rec["passes"] for rec in done.values())
         kept, missing, unformatted = 0, 0, 0
-        with open(args.emit, "w") as f:
+        emit_tmp = args.emit + ".tmp"
+        stats_path = args.emit + ".stats.json"
+        stats_tmp = stats_path + ".tmp"
+        with open(emit_tmp, "w") as f:
             for row in rows:
                 rec = done.get(row["metadata"]["uid"])
                 if rec is None:
@@ -190,12 +202,6 @@ def main():
                     row["metadata"]["base_pass"] = rec["passes"]
                     f.write(json.dumps(row, ensure_ascii=False) + "\n")
                     kept += 1
-        if unformatted:
-            raise SystemExit(
-                f"ABORT: {unformatted} in-band prompts lack the boxing instruction — "
-                f"candidates.jsonl is stale (regenerate with data_prep.py); refusing to emit a "
-                f"pool whose format diverges from eval."
-            )
         stats = {
             "candidates": len(rows),
             "graded": len(done),
@@ -204,9 +210,24 @@ def main():
             "band": [args.keep_min, args.keep_max],
             "pass_histogram": dict(sorted(hist.items())),
         }
-        with open(args.emit + ".stats.json", "w") as f:
-            json.dump(stats, f, indent=2)
         print(json.dumps(stats, indent=2))
+        if unformatted:
+            os.remove(emit_tmp)
+            raise SystemExit(
+                f"ABORT: {unformatted} in-band prompts lack the boxing instruction — "
+                f"candidates.jsonl is stale (regenerate with data_prep.py); refusing to emit a "
+                f"pool whose format diverges from eval."
+            )
+        if missing:
+            os.remove(emit_tmp)
+            raise SystemExit(
+                f"INCOMPLETE: {missing} candidates are still ungraded; rerun the sampling stage "
+                "before emitting the training pool."
+            )
+        with open(stats_tmp, "w") as f:
+            json.dump(stats, f, indent=2)
+        os.replace(emit_tmp, args.emit)
+        os.replace(stats_tmp, stats_path)
         return
 
     global grade_response
